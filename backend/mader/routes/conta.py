@@ -23,7 +23,7 @@ async def criar_conta(usuario: UsuarioSchema, session: Session):
         select(User).where(
             or_(
                 User.email == usuario.email,
-                User.username == username_sanitizado
+                User.username == username_sanitizado,
             )
         )
     )
@@ -31,5 +31,5 @@ async def criar_conta(usuario: UsuarioSchema, session: Session):
         return HTTPException(
             status_code=HTTPStatus.CONFLICT, detail='Conta já consta no MADR'
         )
-    senha_criptografada = criptografar_senha(usuario.senha)
+    # senha_criptografada = criptografar_senha(usuario.senha)
     return db_usuario
