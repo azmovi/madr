@@ -14,8 +14,7 @@
   },
   "dependencies": {
     "typescript-language-server": "^4.3.3",
-    "vue": "^3.4.29",
-    "vue-router": "^4.3.3"
+    "vue": "^3.4.29"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.8.0",
