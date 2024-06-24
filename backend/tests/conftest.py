@@ -8,11 +8,6 @@ from mader.models import table_registry
 
 
 @pytest.fixture()
-def client():
-    return TestClient(app)
-
-
-@pytest.fixture()
 def session():
     engine = create_engine("postgresql+psycopg://postgres:postgres@localhost:5432/mader_test")
     table_registry.metadata.create_all(engine)
@@ -20,3 +15,8 @@ def session():
         yield session
 
     table_registry.metadata.drop_all(engine)
+
+
+@pytest.fixture()
+def client(session):
+    return TestClient(app)

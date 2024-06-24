@@ -16,4 +16,3 @@ class UsuarioPublico(BaseModel):
     id: int
     username: str
     email: EmailStr
-    senha: str
