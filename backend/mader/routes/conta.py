@@ -1,18 +1,15 @@
 from http import HTTPStatus
-from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import or_, select
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, HTTPException
+from sqlalchemy import select
 
-from mader.database import get_session
+from mader.database import AsyncSession
 from mader.models import User
 from mader.schemas import UsuarioPublico, UsuarioSchema
 from mader.security import criptografar_senha
-from mader.utils import sanitizar_username
+from mader.utils import add_commit, sanitizar_username
 
 router = APIRouter(prefix='/conta', tags=['conta'])
-AsyncSession = Annotated[AsyncSession, Depends(get_session)]
 
 
 @router.post(
@@ -20,25 +17,24 @@ AsyncSession = Annotated[AsyncSession, Depends(get_session)]
 )
 async def criar_conta(usuario: UsuarioSchema, session: AsyncSession):
     username_sanitizado = sanitizar_username(usuario.username)
+
     db_usuario = await session.scalar(
         select(User).where(
-            or_(
-                User.email == usuario.email,
-                User.username == username_sanitizado,
-            )
+            (User.email == usuario.email)
+            | (User.username == username_sanitizado)
         )
     )
     if db_usuario:
-        return HTTPException(
+        raise HTTPException(
             status_code=HTTPStatus.CONFLICT, detail='Conta já consta no MADR'
         )
+
     senha_criptografada = criptografar_senha(usuario.senha)
+
     db_usuario = User(
-        email=usuario.email,
         username=usuario.username,
-        senha=senha_criptografada
+        email=usuario.email,
+        senha=senha_criptografada,
     )
-    session.add(db_usuario)
-    await session.commit()
-    await session.refresh(db_usuario)
+    await add_commit(db_usuario, session)
     return db_usuario

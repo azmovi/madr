@@ -6,7 +6,6 @@ class Message(BaseModel):
 
 
 class UsuarioSchema(BaseModel):
-    id: int
     username: str
     email: EmailStr
     senha: str

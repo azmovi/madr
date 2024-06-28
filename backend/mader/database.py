@@ -1,11 +1,16 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
+from typing import Annotated
 
-from mader.settings import Settings
+from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
-engine = create_engine(Settings().DATABASE_URL)
+from mader.settings import settings
+
+engine = create_async_engine(settings.DATABASE_URL)
 
 
-def get_session():
-    with Session(engine) as session:
-        yield session
+async def get_async_session():  # pragma: no cover
+    async with AsyncSession(engine, expire_on_commit=False) as async_session:
+        yield async_session
+
+
+AsyncSession = Annotated[AsyncSession, Depends(get_async_session)]
