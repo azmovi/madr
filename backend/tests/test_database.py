@@ -7,7 +7,7 @@ from mader.models import User
 
 
 @pytest.mark.asyncio()
-async def teste_criar_ususario_db(async_session: AsyncSession, faker: Faker):
+async def test_criar_ususario_db(async_session: AsyncSession, faker: Faker):
     novo_usuario = User(
         username=faker.name(), senha=faker.password(), email=faker.email()
     )

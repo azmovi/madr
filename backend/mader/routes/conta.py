@@ -38,3 +38,9 @@ async def criar_conta(usuario: UsuarioSchema, session: AsyncSession):
     )
     await add_commit(db_usuario, session)
     return db_usuario
+
+
+# @router.put(
+#    '/{id}', response_model=UsuarioPublico, status_code=HTTPStatus.OK
+# )
+# async def atulizar_conta(id: int)

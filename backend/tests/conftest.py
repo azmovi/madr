@@ -1,5 +1,4 @@
 import pytest_asyncio
-from faker import Faker
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
@@ -11,7 +10,9 @@ from testcontainers.postgres import PostgresContainer
 from mader.app import app
 from mader.database import get_async_session
 from mader.models import User, table_registry
-from mader.utils import add_commit, sanitizar_username
+from mader.security import criptografar_senha
+from mader.utils import add_commit
+from tests.factories import UserFactory
 
 
 @pytest_asyncio.fixture(scope='session')
@@ -51,12 +52,9 @@ async def client(async_session: AsyncSession):
 
 
 @pytest_asyncio.fixture()
-async def user(async_session: AsyncSession, faker: Faker) -> User:
-    nome_sanitizado = sanitizar_username(faker.name())
-    user = User(
-        username=nome_sanitizado,
-        email=faker.email(),
-        senha=faker.password(),
-    )
+async def user(async_session: AsyncSession) -> User:
+    senha_fake = 'testtest'
+    user = UserFactory(senha=criptografar_senha(senha_fake))
     await add_commit(user, async_session)
+    user.senha_limpa = 'testtest'
     return user
