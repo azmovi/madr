@@ -16,6 +16,7 @@ pwdlib = {extras = ["argon2"], version = "^0.2.0"}
 sqlalchemy = {extras = ["asyncio"], version = "^2.0.31"}
 psycopg = {extras = ["binary"], version = "^3.1.19"}
 pytest-faker = "^2.0.0"
+greenlet = "^3.0.3"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -52,6 +53,9 @@ run = 'fastapi dev mader/app.py'
 pre_test = 'task lint'
 test = 'pytest -s -x --cov=mader -vv'
 post_test = 'coverage html'
+
+[tool.coverage.run]
+concurrency = ['thread', 'greenlet']
 
 [build-system]
 requires = ["poetry-core"]
