@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 
 from mader.database import AsyncSession
@@ -9,13 +9,14 @@ from mader.schemas import Token
 from mader.security import (
     OAuth2Form,
     criar_token_jwt_de_acesso,
+    get_usuario_atual,
     verificar_senha,
 )
 
 router = APIRouter(prefix='', tags=[])
 
 
-@router.post('/token', status_code=HTTPStatus.OK, response_model=Token)
+@router.post('/token', response_model=Token)
 async def conseguir_token(credenciais: OAuth2Form, session: AsyncSession):
     credenciais_invalidas = HTTPException(
         status_code=HTTPStatus.BAD_REQUEST, detail='Email ou senha incorretos'
@@ -30,6 +31,14 @@ async def conseguir_token(credenciais: OAuth2Form, session: AsyncSession):
     if not verificar_senha(credenciais.password, db_user.senha):
         raise credenciais_invalidas
 
-    token = await criar_token_jwt_de_acesso({'sub': db_user.email})
+    token = criar_token_jwt_de_acesso({'sub': db_user.email})
 
     return {'access_token': token, 'token_type': 'bearer'}
+
+
+@router.post('/refresh-token', response_model=Token)
+async def recarregar_token(user: User = Depends(get_usuario_atual)):
+
+    token_atualizado = criar_token_jwt_de_acesso({'sub': user.email})
+
+    return {'access_token': token_atualizado, 'token_type': 'bearer'}
