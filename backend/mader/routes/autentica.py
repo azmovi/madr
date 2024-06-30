@@ -26,6 +26,7 @@ async def conseguir_token(credenciais: OAuth2Form, session: AsyncSession):
         )
     ):
         raise credenciais_invalidas
+
     if not verificar_senha(credenciais.password, db_user.senha):
         raise credenciais_invalidas
 
