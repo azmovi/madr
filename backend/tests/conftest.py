@@ -17,11 +17,9 @@ from tests.factories import UserFactory
 
 @pytest_asyncio.fixture(scope='session')
 async def async_engine():
-    with PostgresContainer('postgres:16', driver='psycopg') as postgres:
+    with PostgresContainer('postgres:latest', driver='psycopg') as postgres:
         _engine = create_async_engine(postgres.get_connection_url())
-
-        async with _engine.begin():
-            yield _engine
+        yield _engine
 
 
 @pytest_asyncio.fixture()
@@ -63,6 +61,6 @@ async def user(async_session: AsyncSession) -> User:
 @pytest_asyncio.fixture()
 async def token(client: AsyncClient, user: User) -> str:
     response = await client.post(
-        '/token',
-        data={'username': user.email, 'password': user.senha_limpa})
+        '/token', data={'username': user.email, 'password': user.senha_limpa}
+    )
     return response.json()['access_token']

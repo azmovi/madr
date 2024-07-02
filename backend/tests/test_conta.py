@@ -59,14 +59,14 @@ async def test_atualizar_usuario(
 ):
     esperado = {
         'username': sanitizar_username(faker.name()),
-        'email': faker.email()
+        'email': faker.email(),
     }
     payload = {**esperado, 'senha': faker.password()}
 
     response = await client.put(
         f'/conta/{user.id}',
         headers={'Authorization': f'Bearer {token}'},
-        json=payload
+        json=payload,
     )
 
     assert response.status_code == HTTPStatus.OK
@@ -79,14 +79,14 @@ async def test_atualizar_usuario_id_errado(
 ):
     esperado = {
         'username': sanitizar_username(faker.name()),
-        'email': faker.email()
+        'email': faker.email(),
     }
     payload = {**esperado, 'senha': faker.password()}
 
     response = await client.put(
         f'/conta/{user.id + 1}',
         headers={'Authorization': f'Bearer {token}'},
-        json=payload
+        json=payload,
     )
 
     assert response.status_code == HTTPStatus.UNAUTHORIZED
@@ -94,9 +94,7 @@ async def test_atualizar_usuario_id_errado(
 
 
 @pytest.mark.asyncio()
-async def test_deletar_usuario(
-    client: AsyncClient, user: User, token: str
-):
+async def test_deletar_usuario(client: AsyncClient, user: User, token: str):
     response = await client.delete(
         f'/conta/{user.id}',
         headers={'Authorization': f'Bearer {token}'},

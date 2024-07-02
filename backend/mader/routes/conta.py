@@ -64,9 +64,7 @@ async def atualizar_conta(
 
 @router.delete('/{id}', response_model=Message)
 async def deletar_conta(
-    id: int,
-    session: AsyncSession,
-    usuario_atual: UsuarioAtual
+    id: int, session: AsyncSession, usuario_atual: UsuarioAtual
 ):
     if id != usuario_atual.id:
         raise HTTPException(
