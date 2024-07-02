@@ -71,3 +71,4 @@ def verificar_senha(plaintext_senha: str, hashed_senha: str) -> bool:
 
 
 OAuth2Form = Annotated[OAuth2PasswordRequestForm, Depends()]
+UsuarioAtual = Annotated[User, Depends(get_usuario_atual)]

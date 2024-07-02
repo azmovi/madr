@@ -38,7 +38,6 @@ async def conseguir_token(credenciais: OAuth2Form, session: AsyncSession):
 
 @router.post('/refresh-token', response_model=Token)
 async def recarregar_token(user: User = Depends(get_usuario_atual)):
-
     token_atualizado = criar_token_jwt_de_acesso({'sub': user.email})
 
     return {'access_token': token_atualizado, 'token_type': 'bearer'}

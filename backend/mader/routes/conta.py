@@ -5,9 +5,14 @@ from sqlalchemy import select
 
 from mader.database import AsyncSession
 from mader.models import User
-from mader.schemas import UsuarioPublico, UsuarioSchema
-from mader.security import criptografar_senha
-from mader.utils import add_commit, sanitizar_username
+from mader.schemas import Message, UsuarioPublico, UsuarioSchema
+from mader.security import UsuarioAtual, criptografar_senha
+from mader.utils import (
+    add_commit,
+    atualizar_usuario,
+    atualizar_usuario_no_banco,
+    sanitizar_username,
+)
 
 router = APIRouter(prefix='/conta', tags=['conta'])
 
@@ -40,7 +45,35 @@ async def criar_conta(usuario: UsuarioSchema, session: AsyncSession):
     return db_usuario
 
 
-# @router.put(
-#    '/{id}', response_model=UsuarioPublico, status_code=HTTPStatus.OK
-# )
-# async def atulizar_conta(id: int)
+@router.put('/{id}', response_model=UsuarioPublico)
+async def atualizar_conta(
+    id: int,
+    usuario: UsuarioSchema,
+    session: AsyncSession,
+    usuario_atual: UsuarioAtual,
+):
+    if id != usuario_atual.id:
+        raise HTTPException(
+            status_code=HTTPStatus.UNAUTHORIZED, detail='Não autorizado'
+        )
+    atualizar_usuario(usuario, usuario_atual)
+    await atualizar_usuario_no_banco(session, usuario_atual)
+
+    return usuario_atual
+
+
+@router.delete('/{id}', response_model=Message)
+async def deletar_conta(
+    id: int,
+    session: AsyncSession,
+    usuario_atual: UsuarioAtual
+):
+    if id != usuario_atual.id:
+        raise HTTPException(
+            status_code=HTTPStatus.UNAUTHORIZED, detail='Não autorizado'
+        )
+
+    await session.delete(usuario_atual)
+    await session.commit()
+
+    return {'message': 'Conta deletada com sucesso'}

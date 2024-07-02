@@ -58,3 +58,11 @@ async def user(async_session: AsyncSession) -> User:
     await add_commit(user, async_session)
     user.senha_limpa = 'testtest'
     return user
+
+
+@pytest_asyncio.fixture()
+async def token(client: AsyncClient, user: User) -> str:
+    response = await client.post(
+        '/token',
+        data={'username': user.email, 'password': user.senha_limpa})
+    return response.json()['access_token']
