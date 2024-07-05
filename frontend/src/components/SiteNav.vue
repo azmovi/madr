@@ -6,36 +6,42 @@ import { RouterLink } from "vue-router";
     <header>
         <nav>
             <RouterLink :to="{ name: 'home' }">
-                <div class="home">
+                <div class="botao home">
                     <h1>MADR</h1>
                 </div>
             </RouterLink>
+
             <ul>
-                <li class="item"> Livros </li>
-                <li class="item"> Romancistas </li>
+                <RouterLink :to="{ name: 'livros' }">
+                    <li class="botao item"> Livros </li>
+                </RouterLink>
+                <RouterLink :to="{ name: 'romancistas' }">
+                    <li class="botao item"> Romancistas </li>
+                </RouterLink>
             </ul>
-            <button type="button"> Sign in / Sign up </button>
+
+            <RouterLink :to="{ name: 'conta' }">
+                <div>
+                    <p class="botao conta"> Sign In/Sign Up </p>
+                </div>
+            </RouterLink>
         </nav>
     </header>
 </template>
 
 <style scoped>
 nav{
-    padding: 5%;
     display: flex;
     align-items: center;
     justify-content: space-between;
-
+    margin-left: 10%;
+    margin-right: 10%;
 }
 
 ul{
     display: flex;
     list-style: none;
-    gap: 12%;
+    gap: 15%;
 }
 
-
-.home{
-  color: #d3d3d3;
-}
 </style>

@@ -6,7 +6,6 @@ import SiteNav from '@/components/SiteNav.vue'
 <template>
     <SiteNav />
     <RouterView />
-    ola
 </template>
 
 <style scoped>

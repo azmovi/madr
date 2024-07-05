@@ -1,22 +1,32 @@
-#app {
-  max-width: 1280px;
-  box-sizing: border-box;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
-  font-family: FiraCode;
-  color: #d3d3d3;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-header{
+#app {
+    font-weight: normal;
+    font-family: FiraCode, monospace;
+    background-color: #181A21;
+}
+
+header {
     background-color: #ff6961;
     width: 100%;
 }
 
-body{
-  background-color: #181A21;
+a {
+    text-decoration: none;
+    color: #d3d3d3;
 }
 
-a{
-  text-decoration: none;
+nav > ul li {
+    text-decoration: none;
+    color: #d3d3d3;
+}
+
+
+nav > a:hover{
+    color: #000000;
+    background-color: black;
 }
