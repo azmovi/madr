@@ -14,19 +14,3 @@ header {
     background-color: #ff6961;
     width: 100%;
 }
-
-a {
-    text-decoration: none;
-    color: #d3d3d3;
-}
-
-nav > ul li {
-    text-decoration: none;
-    color: #d3d3d3;
-}
-
-
-nav > a:hover{
-    color: #000000;
-    background-color: black;
-}

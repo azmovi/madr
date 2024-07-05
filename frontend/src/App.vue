@@ -4,8 +4,12 @@ import SiteNav from '@/components/SiteNav.vue'
 </script>
 
 <template>
-    <SiteNav />
-    <RouterView />
+    <header>
+        <SiteNav />
+    </header>
+    <main>
+        <RouterView />
+    </main>
 </template>
 
 <style scoped>
