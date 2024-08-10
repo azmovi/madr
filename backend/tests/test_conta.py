@@ -89,8 +89,8 @@ async def test_atualizar_usuario_id_errado(
         json=payload,
     )
 
-    assert response.status_code == HTTPStatus.UNAUTHORIZED
-    assert response.json() == {'detail': 'Não autorizado'}
+    assert response.status_code == HTTPStatus.FORBIDDEN
+    assert response.json() == {'detail': 'Permissão insuficiente'}
 
 
 @pytest.mark.asyncio()
@@ -113,5 +113,5 @@ async def test_deletar_usuario_id_errado(
         headers={'Authorization': f'Bearer {token}'},
     )
 
-    assert response.status_code == HTTPStatus.UNAUTHORIZED
-    assert response.json() == {'detail': 'Não autorizado'}
+    assert response.status_code == HTTPStatus.FORBIDDEN
+    assert response.json() == {'detail': 'Permissão insuficiente'}

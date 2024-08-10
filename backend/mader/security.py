@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from http import HTTPStatus
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -17,7 +17,7 @@ from mader.settings import settings
 pwd_context = PasswordHash.recommended()
 
 
-def criar_token_jwt_de_acesso(dados: dict):
+def criar_token_jwt_de_acesso(dados: dict[str, Any]) -> str:
     dados_para_codificar = dados.copy()
     tmp_exp = datetime.now(tz=ZoneInfo('UTC')) + timedelta(
         minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
@@ -34,7 +34,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/token')
 
 async def get_usuario_atual(
     session: AsyncSession, token: str = Depends(oauth2_scheme)
-):
+) -> User:
     credentials_exception = HTTPException(
         status_code=HTTPStatus.UNAUTHORIZED,
         detail='Could not validate credentials',
@@ -53,12 +53,17 @@ async def get_usuario_atual(
 
     except DecodeError:
         raise credentials_exception
+
     except ExpiredSignatureError:
         raise credentials_exception
 
     user_db = await session.scalar(
         select(User).where(User.email == token_data.username)
     )
+
+    if not user_db:
+        raise credentials_exception
+
     return user_db
 
 

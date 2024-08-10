@@ -17,7 +17,10 @@ router = APIRouter(prefix='', tags=[])
 
 
 @router.post('/token', response_model=Token)
-async def conseguir_token(credenciais: OAuth2Form, session: AsyncSession):
+async def conseguir_token(
+    credenciais: OAuth2Form,
+    session: AsyncSession,
+) -> dict[str, str]:
     credenciais_invalidas = HTTPException(
         status_code=HTTPStatus.BAD_REQUEST, detail='Email ou senha incorretos'
     )
@@ -37,7 +40,9 @@ async def conseguir_token(credenciais: OAuth2Form, session: AsyncSession):
 
 
 @router.post('/refresh-token', response_model=Token)
-async def recarregar_token(user: User = Depends(get_usuario_atual)):
+async def recarregar_token(
+    user: User = Depends(get_usuario_atual),
+) -> dict[str, str]:
     token_atualizado = criar_token_jwt_de_acesso({'sub': user.email})
 
     return {'access_token': token_atualizado, 'token_type': 'bearer'}

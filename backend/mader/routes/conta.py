@@ -45,16 +45,16 @@ async def criar_conta(usuario: UsuarioSchema, session: AsyncSession):
     return db_usuario
 
 
-@router.put('/{id}', response_model=UsuarioPublico)
+@router.put('/{conta_id}', response_model=UsuarioPublico)
 async def atualizar_conta(
-    id: int,
+    conta_id: int,
     usuario: UsuarioSchema,
     session: AsyncSession,
     usuario_atual: UsuarioAtual,
 ):
-    if id != usuario_atual.id:
+    if conta_id != usuario_atual.id:
         raise HTTPException(
-            status_code=HTTPStatus.UNAUTHORIZED, detail='Não autorizado'
+            status_code=HTTPStatus.FORBIDDEN, detail='Permissão insuficiente'
         )
     atualizar_usuario(usuario, usuario_atual)
     await atualizar_usuario_no_banco(session, usuario_atual)
@@ -62,13 +62,13 @@ async def atualizar_conta(
     return usuario_atual
 
 
-@router.delete('/{id}', response_model=Message)
+@router.delete('/{conta_id}', response_model=Message)
 async def deletar_conta(
-    id: int, session: AsyncSession, usuario_atual: UsuarioAtual
+    conta_id: int, session: AsyncSession, usuario_atual: UsuarioAtual
 ):
-    if id != usuario_atual.id:
+    if conta_id != usuario_atual.id:
         raise HTTPException(
-            status_code=HTTPStatus.UNAUTHORIZED, detail='Não autorizado'
+            status_code=HTTPStatus.FORBIDDEN, detail='Permissão insuficiente'
         )
 
     await session.delete(usuario_atual)
