@@ -7,9 +7,7 @@ from mader.routes import autentica, conta
 from mader.schemas import Message
 
 app = FastAPI(
-    title='MADR',
-    description='Meu Acervo de Romancistas',
-    version='0.0.1'
+    title='MADR', description='Meu Acervo de Romancistas', version='0.0.1'
 )
 app.include_router(conta.router)
 app.include_router(autentica.router)

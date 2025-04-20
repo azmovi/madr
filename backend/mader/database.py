@@ -13,4 +13,4 @@ async def get_async_session():  # pragma: no cover
         yield async_session
 
 
-AsyncSession = Annotated[AsyncSession, Depends(get_async_session)]
+Session = Annotated[AsyncSession, Depends(get_async_session)]

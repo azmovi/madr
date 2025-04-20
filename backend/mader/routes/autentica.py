@@ -3,7 +3,7 @@ from http import HTTPStatus
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 
-from mader.database import AsyncSession
+from mader.database import Session
 from mader.models import User
 from mader.schemas import Token
 from mader.security import (
@@ -19,7 +19,7 @@ router = APIRouter(prefix='', tags=[])
 @router.post('/token', response_model=Token)
 async def conseguir_token(
     credenciais: OAuth2Form,
-    session: AsyncSession,
+    session: Session,
 ) -> dict[str, str]:
     credenciais_invalidas = HTTPException(
         status_code=HTTPStatus.BAD_REQUEST, detail='Email ou senha incorretos'

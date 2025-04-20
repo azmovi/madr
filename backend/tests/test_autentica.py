@@ -1,16 +1,14 @@
 from http import HTTPStatus
 
-import pytest
 from factory import Faker
+from fastapi.testclient import TestClient
 from freezegun import freeze_time
-from httpx import AsyncClient
 
 from mader.models import User
 
 
-@pytest.mark.asyncio()
-async def test_conseguir_token_de_acesso(client: AsyncClient, user: User):
-    response = await client.post(
+def test_conseguir_token_de_acesso(client: TestClient, user: User):
+    response = client.post(
         '/token', data={'username': user.email, 'password': user.senha_limpa}
     )
     token = response.json()
@@ -20,11 +18,8 @@ async def test_conseguir_token_de_acesso(client: AsyncClient, user: User):
     assert 'token_type' in token
 
 
-@pytest.mark.asyncio()
-async def test_token_para_email_inexistente(
-    client: AsyncClient, user: User
-):
-    response = await client.post(
+def test_token_para_email_inexistente(client: TestClient, user: User):
+    response = client.post(
         '/token',
         data={'username': 'xpto' + user.email, 'password': user.senha_limpa},
     )
@@ -32,11 +27,8 @@ async def test_token_para_email_inexistente(
     assert response.json() == {'detail': 'Email ou senha incorretos'}
 
 
-@pytest.mark.asyncio()
-async def test_token_senha_incorreta(
-    client: AsyncClient, user: User
-):
-    response = await client.post(
+def test_token_senha_incorreta(client: TestClient, user: User):
+    response = client.post(
         '/token',
         data={'username': user.email, 'password': user.senha},
     )
@@ -44,11 +36,8 @@ async def test_token_senha_incorreta(
     assert response.json() == {'detail': 'Email ou senha incorretos'}
 
 
-@pytest.mark.asyncio()
-async def test_refresh_token(
-        client: AsyncClient, user: User, token: str
-):
-    response = await client.post(
+def test_refresh_token(client: TestClient, user: User, token: str):
+    response = client.post(
         '/refresh-token',
         headers={'Authorization': f'Bearer {token}'},
     )
@@ -61,10 +50,9 @@ async def test_refresh_token(
     assert data['token_type'] == 'bearer'
 
 
-@pytest.mark.asyncio()
-async def test_jwt_expirou(client: AsyncClient, user: User, faker: Faker):
+def test_jwt_expirou(client: TestClient, user: User, faker: Faker):
     with freeze_time('2024-08-10 12:00:00'):
-        response = await client.post(
+        response = client.post(
             '/token',
             data={'username': user.email, 'password': user.senha_limpa},
         )
@@ -72,7 +60,7 @@ async def test_jwt_expirou(client: AsyncClient, user: User, faker: Faker):
         token = response.json()['access_token']
 
     with freeze_time('2024-08-10 13:00:01'):
-        response = await client.put(
+        response = client.put(
             f'/conta/{user.id}',
             headers={'Authorization': f'Bearer {token}'},
             json={

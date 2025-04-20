@@ -1,29 +1,26 @@
 from http import HTTPStatus
 
-import pytest
 from faker import Faker
-from httpx import AsyncClient
+from fastapi.testclient import TestClient
 
 from mader.models import User
 from mader.utils import sanitizar_username
 
 
-@pytest.mark.asyncio()
-async def test_criar_usuario(client: AsyncClient, faker: Faker):
+def test_criar_usuario(client: TestClient, faker: Faker):
     esperado = {'username': faker.name(), 'email': faker.email()}
     payload = {**esperado, 'senha': faker.password()}
 
-    response = await client.post('/conta/', json=payload)
+    response = client.post('/conta/', json=payload)
 
     assert response.status_code == HTTPStatus.CREATED
     assert response.json() == {'id': 1, **esperado}
 
 
-@pytest.mark.asyncio()
-async def test_criar_usuario_com_username_existente(
-    client: AsyncClient, faker: Faker, user: User
+def test_criar_usuario_com_username_existente(
+    client: TestClient, faker: Faker, user: User
 ):
-    response = await client.post(
+    response = client.post(
         '/conta/',
         json={
             'username': user.username,
@@ -36,11 +33,10 @@ async def test_criar_usuario_com_username_existente(
     assert response.json() == {'detail': 'Conta já consta no MADR'}
 
 
-@pytest.mark.asyncio()
-async def test_criar_usuario_com_email_existente(
-    client: AsyncClient, faker: Faker, user: User
+def test_criar_usuario_com_email_existente(
+    client: TestClient, faker: Faker, user: User
 ):
-    response = await client.post(
+    response = client.post(
         '/conta/',
         json={
             'username': faker.name(),
@@ -53,9 +49,8 @@ async def test_criar_usuario_com_email_existente(
     assert response.json() == {'detail': 'Conta já consta no MADR'}
 
 
-@pytest.mark.asyncio()
-async def test_atualizar_usuario(
-    client: AsyncClient, faker: Faker, user: User, token: str
+def test_atualizar_usuario(
+    client: TestClient, faker: Faker, user: User, token: str
 ):
     esperado = {
         'username': sanitizar_username(faker.name()),
@@ -63,7 +58,7 @@ async def test_atualizar_usuario(
     }
     payload = {**esperado, 'senha': faker.password()}
 
-    response = await client.put(
+    response = client.put(
         f'/conta/{user.id}',
         headers={'Authorization': f'Bearer {token}'},
         json=payload,
@@ -73,9 +68,8 @@ async def test_atualizar_usuario(
     assert response.json() == {'id': user.id, **esperado}
 
 
-@pytest.mark.asyncio()
-async def test_atualizar_usuario_id_errado(
-    client: AsyncClient, faker: Faker, user: User, token: str
+def test_atualizar_usuario_id_errado(
+    client: TestClient, faker: Faker, user: User, token: str
 ):
     esperado = {
         'username': sanitizar_username(faker.name()),
@@ -83,7 +77,7 @@ async def test_atualizar_usuario_id_errado(
     }
     payload = {**esperado, 'senha': faker.password()}
 
-    response = await client.put(
+    response = client.put(
         f'/conta/{user.id + 1}',
         headers={'Authorization': f'Bearer {token}'},
         json=payload,
@@ -93,9 +87,8 @@ async def test_atualizar_usuario_id_errado(
     assert response.json() == {'detail': 'Permissão insuficiente'}
 
 
-@pytest.mark.asyncio()
-async def test_deletar_usuario(client: AsyncClient, user: User, token: str):
-    response = await client.delete(
+def test_deletar_usuario(client: TestClient, user: User, token: str):
+    response = client.delete(
         f'/conta/{user.id}',
         headers={'Authorization': f'Bearer {token}'},
     )
@@ -104,11 +97,8 @@ async def test_deletar_usuario(client: AsyncClient, user: User, token: str):
     assert response.json() == {'message': 'Conta deletada com sucesso'}
 
 
-@pytest.mark.asyncio()
-async def test_deletar_usuario_id_errado(
-    client: AsyncClient, user: User, token: str
-):
-    response = await client.delete(
+def test_deletar_usuario_id_errado(client: TestClient, user: User, token: str):
+    response = client.delete(
         f'/conta/{user.id + 1}',
         headers={'Authorization': f'Bearer {token}'},
     )

@@ -1,15 +1,15 @@
 from datetime import datetime, timedelta
 from http import HTTPStatus
 from typing import Annotated, Any
+from zoneinfo import ZoneInfo
 
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt import DecodeError, ExpiredSignatureError, decode, encode
 from pwdlib import PasswordHash
 from sqlalchemy import select
-from zoneinfo import ZoneInfo
 
-from mader.database import AsyncSession
+from mader.database import Session
 from mader.models import User
 from mader.schemas import TokenData
 from mader.settings import settings
@@ -33,7 +33,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/token')
 
 
 async def get_usuario_atual(
-    session: AsyncSession, token: str = Depends(oauth2_scheme)
+    session: Session, token: str = Depends(oauth2_scheme)
 ) -> User:
     credentials_exception = HTTPException(
         status_code=HTTPStatus.UNAUTHORIZED,

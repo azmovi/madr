@@ -3,10 +3,10 @@ from http import HTTPStatus
 import pytest
 from faker import Faker
 from fastapi import HTTPException
-from httpx import AsyncClient
+from fastapi.testclient import TestClient
 from jwt import decode, encode
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from mader.database import AsyncSession
 from mader.models import User
 from mader.security import criar_token_jwt_de_acesso, get_usuario_atual
 from mader.settings import settings
@@ -23,9 +23,8 @@ def test_criar_token_jwt():
     assert decodificado['exp']
 
 
-@pytest.mark.asyncio()
-async def test_token_jwt_invalido(client: AsyncClient, user: User):
-    response = await client.delete(
+def test_token_jwt_invalido(client: TestClient, user: User):
+    response = client.delete(
         f'/conta/{user.id}', headers={'Authorization': 'Bearer token-invalido'}
     )
 
@@ -33,11 +32,9 @@ async def test_token_jwt_invalido(client: AsyncClient, user: User):
     assert response.json() == {'detail': 'Could not validate credentials'}
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_token_sub_vazio(async_session: AsyncSession):
-    token = encode(
-        {}, settings.SECRET_KEY, algorithm=settings.ALGORITHM
-    )
+    token = encode({}, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
     with pytest.raises(HTTPException) as excinfo:
         await get_usuario_atual(session=async_session, token=token)
@@ -46,14 +43,14 @@ async def test_token_sub_vazio(async_session: AsyncSession):
     assert excinfo.value.detail == 'Could not validate credentials'
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_token_usuario_inexistente(
     async_session: AsyncSession, faker: Faker
 ):
     token = encode(
         {'sub': faker.email()},
         settings.SECRET_KEY,
-        algorithm=settings.ALGORITHM
+        algorithm=settings.ALGORITHM,
     )
 
     with pytest.raises(HTTPException) as excinfo:

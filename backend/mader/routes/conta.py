@@ -3,7 +3,7 @@ from http import HTTPStatus
 from fastapi import APIRouter, HTTPException
 from sqlalchemy import select
 
-from mader.database import AsyncSession
+from mader.database import Session
 from mader.models import User
 from mader.schemas import Message, UsuarioPublico, UsuarioSchema
 from mader.security import UsuarioAtual, criptografar_senha
@@ -20,7 +20,7 @@ router = APIRouter(prefix='/conta', tags=['conta'])
 @router.post(
     '/', response_model=UsuarioPublico, status_code=HTTPStatus.CREATED
 )
-async def criar_conta(usuario: UsuarioSchema, session: AsyncSession):
+async def criar_conta(usuario: UsuarioSchema, session: Session):
     username_sanitizado = sanitizar_username(usuario.username)
 
     db_usuario = await session.scalar(
@@ -49,7 +49,7 @@ async def criar_conta(usuario: UsuarioSchema, session: AsyncSession):
 async def atualizar_conta(
     conta_id: int,
     usuario: UsuarioSchema,
-    session: AsyncSession,
+    session: Session,
     usuario_atual: UsuarioAtual,
 ):
     if conta_id != usuario_atual.id:
@@ -64,7 +64,7 @@ async def atualizar_conta(
 
 @router.delete('/{conta_id}', response_model=Message)
 async def deletar_conta(
-    conta_id: int, session: AsyncSession, usuario_atual: UsuarioAtual
+    conta_id: int, session: Session, usuario_atual: UsuarioAtual
 ):
     if conta_id != usuario_atual.id:
         raise HTTPException(
