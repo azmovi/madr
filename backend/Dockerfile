@@ -1,13 +1,22 @@
-FROM python:3.12-slim
-ENV POETRY_VIRTUALENVS_CREATE=false
+FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim
 
-WORKDIR app/
-COPY . .
+WORKDIR /app
 
-RUN pip install poetry
+ENV UV_COMPILE_BYTECODE=1
 
-RUN poetry config installer.max-workers 10
-RUN poetry install --no-interaction --no-ansi
+ENV UV_LINK_MODE=copy
 
-EXPOSE 8000
-CMD poetry run uvicorn --host 0.0.0.0 mader.app:app
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --frozen --no-install-project --no-dev
+
+ADD . /app
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev
+
+ENV PATH="/app/.venv/bin:$PATH"
+
+ENTRYPOINT []
+
+CMD fastapi dev --host0.0.0.0 mader/app.py

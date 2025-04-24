@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from sqlalchemy import select
 
 from mader.database import Session
@@ -75,3 +75,13 @@ async def deletar_conta(
     await session.commit()
 
     return {'message': 'Conta deletada com sucesso'}
+
+
+@router.get('/', response_model=list[UsuarioPublico])
+async def get_contas(
+    session: Session,
+    limit: int = Query(default=50),
+    offset: int = Query(default=0),
+):
+    result = await session.scalars(select(User).limit(limit).offset(offset))
+    return result.all()

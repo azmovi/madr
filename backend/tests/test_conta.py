@@ -105,3 +105,17 @@ def test_deletar_usuario_id_errado(client: TestClient, user: User, token: str):
 
     assert response.status_code == HTTPStatus.FORBIDDEN
     assert response.json() == {'detail': 'Permissão insuficiente'}
+
+
+def test_get_conta_withou_conta(client: TestClient):
+    response = client.get('/conta')
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == []
+
+
+def test_get_conta(client: TestClient, user: User):
+    response = client.get('/conta')
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == [
+        {'id': 1, 'username': user.username, 'email': user.email}
+    ]

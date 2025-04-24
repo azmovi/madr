@@ -6,8 +6,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from mader.routes import autentica, conta
 from mader.schemas import Message
 
+version = '0.0.1'
 app = FastAPI(
-    title='MADR', description='Meu Acervo de Romancistas', version='0.0.1'
+    title='MADR', description='Meu Acervo de Romancistas', version=version
 )
 app.include_router(conta.router)
 app.include_router(autentica.router)

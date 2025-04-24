@@ -1,4 +1,11 @@
 services:
+  otel_lgtm:
+    image: grafana/otel-lgtm
+    ports:
+      - 3000:3000 # grafana
+      - 9090:9090 # prometheus
+      - 4317:4317 # collector grpc
+
   mader_database:
     image: postgres
     env_file:
@@ -14,16 +21,27 @@ services:
     build: ./backend/
     env_file:
       - ./backend/.env
+    environment:
+      OTEL_EXPORTER_OTLP_INSECURE: true
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://olgtm:4317
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_SERVICE_NAME: mader
+      OTEL_METRIC_EXPORT_INTERVAL: 1000
+      COLLECTOR_OTLP_ENABLED: true
     ports:
       - "8000:8000"
     depends_on:
       - mader_database
+      - otel_lgtm
 
   vue_app:
     image: vue_app
     build: ./frontend/
     ports:
       - "8080:8080"
+    depends_on:
+      - mader_app
+
 volumes:
   pgdata:
 
