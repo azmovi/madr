@@ -21,13 +21,6 @@ services:
     build: ./backend/
     env_file:
       - ./backend/.env
-    environment:
-      OTEL_EXPORTER_OTLP_INSECURE: true
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://olgtm:4317
-      OTEL_METRICS_EXPORTER: otlp
-      OTEL_SERVICE_NAME: mader
-      OTEL_METRIC_EXPORT_INTERVAL: 1000
-      COLLECTOR_OTLP_ENABLED: true
     ports:
       - "8000:8000"
     depends_on:
