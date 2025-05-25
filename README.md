@@ -7,6 +7,20 @@ Projeto inspirado no curso de fastAPI do @dunossauro
 
 ### Sobre as partes do projeto
 
+#### Env de exemplo
+```bash
+# Database env
+POSTGRES_USER=app_user
+POSTGRES_DB=app_db
+POSTGRES_PASSWORD=app_password
+DATABASE_URL=postgresql+psycopg://app_user:app_password@mader_database:5432/app_db
+
+# Security env
+SECRET_KEY=supersegredosecreto123
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+```
+- sqlalchemy
 #### Backend
 ##### Tecnologia
 - python
@@ -63,3 +77,4 @@ npm run dev
 ```bash
 docker compose up
 ```
+
