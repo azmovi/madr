@@ -14,16 +14,9 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 ADD . /app
 
-
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev
 
 ENV PATH="/app/.venv/bin:$PATH"
 
-RUN opentelemetry-bootstrap -a install
-
-ENTRYPOINT []
-
-CMD opentelemetry-instrument \
-    --logs_exporter console,otlp \
-    uvicorn fastapi dev --host 0.0.0.0 mader/app.py
+CMD ["fastapi", "dev", "--host" "0.0.0.0", "mader/app.py"]

@@ -1,35 +1,25 @@
 services:
-  otel_lgtm:
-    image: grafana/otel-lgtm
-    ports:
-      - 3000:3000 # grafana
-      - 9090:9090 # prometheus
-      - 4317:4317 # collector grpc
-
   mader_database:
     image: postgres
     env_file:
       - ./backend/.env
     volumes:
       - pgdata:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
 
   mader_app:
-    image: mader_app 
-    entrypoint: ./entrypoint.sh
     build: ./backend/
+    image: mader_app
+    entrypoint: ./entrypoint.sh
     env_file:
       - ./backend/.env
-    ports:
-      - "8000:8000"
+    volumes:
+      - ./backend/migrations:/app/migrations
     depends_on:
       - mader_database
-      - otel_lgtm
 
   vue_app:
-    image: vue_app
     build: ./frontend/
+    image: vue_app
     ports:
       - "8080:8080"
     depends_on:
