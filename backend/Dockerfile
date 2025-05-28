@@ -19,4 +19,4 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 ENV PATH="/app/.venv/bin:$PATH"
 
-CMD ["fastapi", "dev", "--host" "0.0.0.0", "mader/app.py"]
+ENTRYPOINT ["/entrypoint.sh"]
