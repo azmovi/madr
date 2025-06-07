@@ -1,12 +1,14 @@
 services:
-  mader_database:
+  database:
     image: postgres
     env_file:
       - ./backend/.env
     volumes:
       - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
 
-  mader_app:
+  backend:
     build: ./backend/
     image: mader_app
     healthcheck:
@@ -14,22 +16,24 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    image: backend
     entrypoint: ./entrypoint.sh
     env_file:
       - ./backend/.env
     volumes:
       - ./backend/migrations:/app/migrations
     depends_on:
-      - mader_database
+      - database
+    ports:
+      - "8000:8000"
 
-  vue_app:
+  frontend:
     build: ./frontend/
-    image: vue_app
+    image: frontend
     ports:
       - "8080:8080"
     depends_on:
-      - mader_app
+      - backend
 
 volumes:
   pgdata:
-

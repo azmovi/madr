@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Mapped, mapped_column, registry
+from sqlalchemy.orm import Mapped, mapped_column, registry, validates
 
 table_registry = registry()
 
@@ -11,3 +11,6 @@ class User:
     username: Mapped[str] = mapped_column(unique=True)
     email: Mapped[str] = mapped_column(unique=True)
     senha: Mapped[str]
+    
+    @validates('username')
+    def validate_username():

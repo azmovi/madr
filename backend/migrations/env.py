@@ -57,7 +57,7 @@ def do_run_migrations(connection):
 
 async def run_async_migrations():
     connectable = async_engine_from_config(
-        config.get_section(config.config_ini_section),
+        config.get_section(config.config_ini_section), # type: ignore
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
