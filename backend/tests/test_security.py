@@ -33,20 +33,18 @@ def test_token_jwt_invalido(client: TestClient, user: User):
 
 
 @pytest.mark.asyncio
-async def test_token_sub_vazio(async_session: AsyncSession):
+async def test_token_sub_vazio(session: AsyncSession):
     token = encode({}, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
     with pytest.raises(HTTPException) as excinfo:
-        await get_usuario_atual(session=async_session, token=token)
+        await get_usuario_atual(session=session, token=token)
 
     assert excinfo.value.status_code == HTTPStatus.UNAUTHORIZED
     assert excinfo.value.detail == 'Could not validate credentials'
 
 
 @pytest.mark.asyncio
-async def test_token_usuario_inexistente(
-    async_session: AsyncSession, faker: Faker
-):
+async def test_token_usuario_inexistente(session: AsyncSession, faker: Faker):
     token = encode(
         {'sub': faker.email()},
         settings.SECRET_KEY,
@@ -54,7 +52,7 @@ async def test_token_usuario_inexistente(
     )
 
     with pytest.raises(HTTPException) as excinfo:
-        await get_usuario_atual(session=async_session, token=token)
+        await get_usuario_atual(session=session, token=token)
 
     assert excinfo.value.status_code == HTTPStatus.UNAUTHORIZED
     assert excinfo.value.detail == 'Could not validate credentials'

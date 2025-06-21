@@ -10,13 +10,12 @@ services:
 
   backend:
     build: ./backend/
-    image: mader_app
+    image: backend
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
       interval: 5s
       timeout: 5s
       retries: 10
-    image: backend
     entrypoint: ./entrypoint.sh
     env_file:
       - ./backend/.env

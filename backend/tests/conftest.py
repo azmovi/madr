@@ -1,8 +1,12 @@
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
+from contextlib import contextmanager
+from datetime import datetime
 
 import pytest
 import pytest_asyncio
+from faker import Faker
 from fastapi.testclient import TestClient
+from sqlalchemy import event
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     create_async_engine,
@@ -10,56 +14,87 @@ from sqlalchemy.ext.asyncio import (
 from testcontainers.postgres import PostgresContainer
 
 from mader.app import app
-from mader.database import get_async_session
+from mader.database import add_obj, get_session
 from mader.models import User, table_registry
-from mader.security import criptografar_senha
-from mader.utils import add_commit
-from tests.factories import UserFactory
+from tests.factories import AdminFactory, UserFactory
+
+faker = Faker()
 
 
 @pytest_asyncio.fixture(scope='session')
-async def async_engine():
+async def engine():
     with PostgresContainer('postgres:latest', driver='psycopg') as postgres:
-        _engine = create_async_engine(postgres.get_connection_url())
-        yield _engine
+        engine = create_async_engine(postgres.get_connection_url())
+        yield engine
 
 
 @pytest_asyncio.fixture
-async def async_session(async_engine) -> AsyncGenerator[AsyncSession]:
-    async with async_engine.begin() as conn:
+async def session(engine) -> AsyncGenerator[AsyncSession]:
+    async with engine.begin() as conn:
         await conn.run_sync(table_registry.metadata.create_all)
 
-    async with AsyncSession(async_engine, expire_on_commit=False) as session:
+    async with AsyncSession(engine, expire_on_commit=False) as session:
         yield session
 
-    async with async_engine.begin() as conn:
+    async with engine.begin() as conn:
         await conn.run_sync(table_registry.metadata.drop_all)
 
 
 @pytest.fixture
-def client(async_session):
+def client(session):
     def get_session_override():
-        return async_session
+        return session
 
     with TestClient(app) as client:
-        app.dependency_overrides[get_async_session] = get_session_override
+        app.dependency_overrides[get_session] = get_session_override
         yield client
 
     app.dependency_overrides.clear()
 
 
+@contextmanager
+def _mock_db_time(*, model, time=datetime.now()):
+    def fake_time_handler(mapper, connection, target):
+        if hasattr(target, 'created_at'):
+            target.created_at = time
+        if hasattr(target, 'updated_at'):
+            target.updated_at = time
+
+    event.listen(model, 'before_insert', fake_time_handler)
+    yield time
+    event.remove(model, 'before_insert', fake_time_handler)
+
+
+@pytest.fixture
+def mock_db_time():
+    return _mock_db_time
+
+
 @pytest_asyncio.fixture
-async def user(async_session: AsyncSession) -> User:
-    senha_fake = 'testtest'
-    user = UserFactory(senha=criptografar_senha(senha_fake))
-    await add_commit(user, async_session)
-    user.senha_limpa = 'testtest'
+async def user(session: AsyncSession) -> User:
+    senha = faker.password()
+    user = UserFactory(senha=senha)
+    await add_obj(session, user)
+    user.senha_limpa = senha
+    return user
+
+
+@pytest_asyncio.fixture
+async def admin(session: AsyncSession) -> User:
+    senha = faker.password()
+    user = AdminFactory(senha=senha)
+    await add_obj(user, session)
+    user.senha_limpa = senha
     return user
 
 
 @pytest.fixture
 def token(client: TestClient, user: User) -> str:
     response = client.post(
-        '/token', data={'username': user.email, 'password': user.senha_limpa}
+        '/auth/token',
+        data={
+            'username': user.email,
+            'password': user.senha_limpa,  # type: ignore[attr-defined]
+        },
     )
     return response.json()['access_token']

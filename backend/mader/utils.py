@@ -1,10 +1,8 @@
 from re import sub
 
-from sqlalchemy.ext.asyncio import AsyncSession
+from pwdlib import PasswordHash
 
-from mader.models import User
-from mader.schemas import UsuarioSchema
-from mader.security import UsuarioAtual, criptografar_senha
+pwd_context = PasswordHash.recommended()
 
 
 def remover_nao_alfanumericos(fragementos: list[str]) -> list[str]:
@@ -17,20 +15,9 @@ def sanitizar_username(username: str) -> str:
     return ' '.join(partes_limpas)
 
 
-async def add_commit(user: User, session: AsyncSession):
-    session.add(user)
-    await session.commit()
-    await session.refresh(user)
+def criptografar_senha(senha: str) -> str:
+    return pwd_context.hash(senha)
 
 
-def atualizar_usuario(usuario: UsuarioSchema, usuario_atual: UsuarioAtual):
-    usuario_atual.username = sanitizar_username(usuario.username)
-    usuario_atual.email = usuario.email
-    usuario_atual.senha = criptografar_senha(usuario.senha)
-
-
-async def atualizar_usuario_no_banco(
-    session: AsyncSession, usuario_atual: UsuarioAtual
-):
-    await session.commit()
-    await session.refresh(usuario_atual)
+def verificar_senha(plaintext_senha: str, hashed_senha: str) -> bool:
+    return pwd_context.verify(plaintext_senha, hashed_senha)

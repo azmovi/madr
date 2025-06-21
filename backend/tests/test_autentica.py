@@ -9,7 +9,8 @@ from mader.models import User
 
 def test_conseguir_token_de_acesso(client: TestClient, user: User):
     response = client.post(
-        '/token', data={'username': user.email, 'password': user.senha_limpa}
+        '/auth/token',
+        data={'username': user.email, 'password': user.senha_limpa}
     )
     token = response.json()
 
@@ -20,7 +21,7 @@ def test_conseguir_token_de_acesso(client: TestClient, user: User):
 
 def test_token_para_email_inexistente(client: TestClient, user: User):
     response = client.post(
-        '/token',
+        '/auth/token',
         data={'username': 'xpto' + user.email, 'password': user.senha_limpa},
     )
     assert response.status_code == HTTPStatus.BAD_REQUEST
@@ -29,7 +30,7 @@ def test_token_para_email_inexistente(client: TestClient, user: User):
 
 def test_token_senha_incorreta(client: TestClient, user: User):
     response = client.post(
-        '/token',
+        '/auth/token',
         data={'username': user.email, 'password': user.senha},
     )
     assert response.status_code == HTTPStatus.BAD_REQUEST
@@ -38,7 +39,7 @@ def test_token_senha_incorreta(client: TestClient, user: User):
 
 def test_refresh_token(client: TestClient, user: User, token: str):
     response = client.post(
-        '/refresh-token',
+        '/auth/refresh-token',
         headers={'Authorization': f'Bearer {token}'},
     )
 
@@ -53,7 +54,7 @@ def test_refresh_token(client: TestClient, user: User, token: str):
 def test_jwt_expirou(client: TestClient, user: User, faker: Faker):
     with freeze_time('2024-08-10 12:00:00'):
         response = client.post(
-            '/token',
+            '/auth/token',
             data={'username': user.email, 'password': user.senha_limpa},
         )
         assert response.status_code == HTTPStatus.OK

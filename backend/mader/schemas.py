@@ -1,3 +1,6 @@
+import uuid
+from enum import IntEnum, auto
+
 from pydantic import BaseModel, EmailStr
 
 
@@ -11,10 +14,16 @@ class UsuarioSchema(BaseModel):
     senha: str
 
 
+class Role(IntEnum):
+    ADMIN = auto()
+    USER = auto()
+
+
 class UsuarioPublico(BaseModel):
-    id: int
+    id: uuid.UUID
     username: str
     email: EmailStr
+    role: Role
 
 
 class Token(BaseModel):

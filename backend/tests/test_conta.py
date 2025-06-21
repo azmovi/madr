@@ -4,17 +4,21 @@ from faker import Faker
 from fastapi.testclient import TestClient
 
 from mader.models import User
+from mader.schemas import Role
 from mader.utils import sanitizar_username
 
 
 def test_criar_usuario(client: TestClient, faker: Faker):
-    esperado = {'username': faker.name(), 'email': faker.email()}
+    esperado = {
+        'username': sanitizar_username(faker.name()),
+        'email': faker.email(),
+    }
     payload = {**esperado, 'senha': faker.password()}
 
     response = client.post('/conta/', json=payload)
 
     assert response.status_code == HTTPStatus.CREATED
-    assert response.json() == {'id': 1, **esperado}
+    assert response.json() == {'id': 1, 'role': Role.USER, **esperado}
 
 
 def test_criar_usuario_com_username_existente(
@@ -65,7 +69,7 @@ def test_atualizar_usuario(
     )
 
     assert response.status_code == HTTPStatus.OK
-    assert response.json() == {'id': user.id, **esperado}
+    assert response.json() == {'id': user.id, 'role': Role.USER, **esperado}
 
 
 def test_atualizar_usuario_id_errado(
@@ -107,7 +111,7 @@ def test_deletar_usuario_id_errado(client: TestClient, user: User, token: str):
     assert response.json() == {'detail': 'Permissão insuficiente'}
 
 
-def test_get_conta_withou_conta(client: TestClient):
+def test_get_conta_without_conta(client: TestClient):
     response = client.get('/conta')
     assert response.status_code == HTTPStatus.OK
     assert response.json() == []
@@ -117,5 +121,10 @@ def test_get_conta(client: TestClient, user: User):
     response = client.get('/conta')
     assert response.status_code == HTTPStatus.OK
     assert response.json() == [
-        {'id': 1, 'username': user.username, 'email': user.email}
+        {
+            'id': 1,
+            'role': Role.USER,
+            'username': user.username,
+            'email': user.email,
+        }
     ]
