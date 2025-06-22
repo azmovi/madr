@@ -20,4 +20,5 @@ def criptografar_senha(senha: str) -> str:
 
 
 def verificar_senha(plaintext_senha: str, hashed_senha: str) -> bool:
-    return pwd_context.verify(plaintext_senha, hashed_senha)
+    if not pwd_context.verify(plaintext_senha, hashed_senha):
+        raise ValueError('Senha incorreta')

@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Query
 from sqlalchemy import select
@@ -34,18 +35,18 @@ async def criar_conta(usuario: UsuarioSchema, session: Session):
 
 @router.put('/{conta_id}', response_model=UsuarioPublico)
 async def atualizar_conta(
-    conta_id: int,
-    usuario: UsuarioSchema,
+    conta_id: UUID,
+    user_input: UsuarioSchema,
     session: Session,
-    usuario_atual: UsuarioAutenticado,
+    usuario: UsuarioAutenticado,
 ):
     try:
-        usuario_atual.username = usuario.username
-        usuario_atual.email = usuario.email
-        usuario_atual.senha = usuario.senha
-        await refresh_obj(session, usuario_atual)
+        usuario.username = user_input.username
+        usuario.email = user_input.email
+        usuario.senha = user_input.senha
+        await refresh_obj(session, usuario)
 
-        return usuario_atual
+        return usuario
 
     except IntegrityError:
         raise HTTPException(
@@ -55,9 +56,9 @@ async def atualizar_conta(
 
 @router.delete('/{conta_id}', response_model=Message)
 async def deletar_conta(
-    conta_id: int, session: Session, usuario_atual: UsuarioAutenticado
+    conta_id: UUID, session: Session, usuario: UsuarioAutenticado
 ):
-    await session.delete(usuario_atual)
+    await session.delete(usuario)
     await session.commit()
 
     return {'message': 'Conta deletada com sucesso'}

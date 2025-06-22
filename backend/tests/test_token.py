@@ -10,7 +10,7 @@ from mader.models import User
 def test_conseguir_token_de_acesso(client: TestClient, user: User):
     response = client.post(
         '/auth/token',
-        data={'username': user.email, 'password': user.senha_limpa}
+        data={'username': user.email, 'password': user.senha_limpa},
     )
     token = response.json()
 
@@ -71,4 +71,4 @@ def test_jwt_expirou(client: TestClient, user: User, faker: Faker):
             },
         )
         assert response.status_code == HTTPStatus.UNAUTHORIZED
-        assert response.json() == {'detail': 'Could not validate credentials'}
+        assert response.json() == {'detail': 'Autenticação invalida'}

@@ -1,5 +1,5 @@
-import uuid
 from datetime import datetime
+from uuid import UUID
 
 from sqlalchemy import func
 from sqlalchemy.orm import Mapped, mapped_column, registry, validates
@@ -23,8 +23,8 @@ class TimestampMixin:
 class User(TimestampMixin):
     __tablename__ = 'users'
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        init=False, primary_key=True, default=uuid.uuid4
+    id: Mapped[UUID] = mapped_column(
+        init=False, primary_key=True, server_default=func.gen_random_uuid()
     )
     username: Mapped[str] = mapped_column(unique=True)
     email: Mapped[str] = mapped_column(unique=True)

@@ -1,5 +1,5 @@
-import uuid
 from enum import IntEnum, auto
+from uuid import UUID
 
 from pydantic import BaseModel, EmailStr
 
@@ -20,7 +20,7 @@ class Role(IntEnum):
 
 
 class UsuarioPublico(BaseModel):
-    id: uuid.UUID
+    id: UUID
     username: str
     email: EmailStr
     role: Role
@@ -32,4 +32,4 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    username: str | None = None
+    subject: UUID

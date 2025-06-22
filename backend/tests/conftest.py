@@ -1,3 +1,4 @@
+import uuid
 from collections.abc import AsyncGenerator
 from contextlib import contextmanager
 from datetime import datetime
@@ -17,8 +18,6 @@ from mader.app import app
 from mader.database import add_obj, get_session
 from mader.models import User, table_registry
 from tests.factories import AdminFactory, UserFactory
-
-faker = Faker()
 
 
 @pytest_asyncio.fixture(scope='session')
@@ -70,8 +69,24 @@ def mock_db_time():
     return _mock_db_time
 
 
+@contextmanager
+def _mock_db_uuid(*, model, uuid=uuid.uuid4()):
+    def fake_uuid_handler(mapper, connection, target):
+        if hasattr(target, 'id'):
+            target.id = uuid
+
+    event.listen(model, 'before_insert', fake_uuid_handler)
+    yield uuid
+    event.remove(model, 'before_insert', fake_uuid_handler)
+
+
+@pytest.fixture
+def mock_db_uuid():
+    return _mock_db_uuid
+
+
 @pytest_asyncio.fixture
-async def user(session: AsyncSession) -> User:
+async def user(session: AsyncSession, faker: Faker) -> User:
     senha = faker.password()
     user = UserFactory(senha=senha)
     await add_obj(session, user)
@@ -80,7 +95,7 @@ async def user(session: AsyncSession) -> User:
 
 
 @pytest_asyncio.fixture
-async def admin(session: AsyncSession) -> User:
+async def admin(session: AsyncSession, faker: Faker) -> User:
     senha = faker.password()
     user = AdminFactory(senha=senha)
     await add_obj(user, session)

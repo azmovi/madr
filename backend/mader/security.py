@@ -1,28 +1,27 @@
 from datetime import datetime, timedelta
-from http import HTTPStatus
-from typing import Annotated, Any
+from typing import Annotated
+from uuid import UUID
 from zoneinfo import ZoneInfo
 
-from fastapi import Depends, HTTPException
+from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jwt import DecodeError, ExpiredSignatureError, decode, encode
-from sqlalchemy import select
+from jwt import decode, encode
 
 from mader.database import Session
-from mader.exceptions import credentials_exception
+from mader.exceptions import insufficient_credentials, unauthorized_credentials
 from mader.models import User
-from mader.schemas import Role, TokenData
+from mader.schemas import Role
 from mader.settings import settings
 
 
-def criar_token_jwt_de_acesso(dados: dict[str, Any]) -> str:
+def criar_token_jwt(dados: dict[str, str]) -> str:
     tmp_exp = datetime.now(tz=ZoneInfo('UTC')) + timedelta(
         minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
     )
     return encode(
         dados.copy() | {'exp': tmp_exp},
         settings.SECRET_KEY,
-        algorithm=settings.ALGORITHM
+        algorithm=settings.ALGORITHM,
     )
 
 
@@ -38,19 +37,15 @@ async def get_usuario_atual(
         payload = decode(
             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
         )
-        username = payload['sub']
-        token_data = TokenData(username=username)
+        user_id = payload['sub']
+        user_db = await session.get(User, user_id)
 
-        user_db = await session.scalar(
-            select(User).where(User.email == token_data.username)
-        )
+    except Exception:
+        raise unauthorized_credentials
 
-        if not user_db:
-            raise credentials_exception
-        return user_db
-
-    except (KeyError, DecodeError, ExpiredSignatureError):
-        raise credentials_exception
+    if not user_db:
+        raise unauthorized_credentials
+    return user_db
 
 
 UsuarioAtual = Annotated[User, Depends(get_usuario_atual)]
@@ -58,17 +53,15 @@ OAuth2Form = Annotated[OAuth2PasswordRequestForm, Depends()]
 
 
 def get_user_with_auth(permission: Role):
-    def check_role(conta_id: int, usuario_atual: UsuarioAtual) -> User:
+    def check_role(conta_id: UUID, usuario_atual: UsuarioAtual) -> User:
         valid_permission = usuario_atual.role <= permission
         same_user = (
             usuario_atual.role == Role.USER and conta_id == usuario_atual.id
         )
         if not valid_permission or not same_user:
-            raise HTTPException(
-                status_code=HTTPStatus.FORBIDDEN,
-                detail='Permissão insuficiente'
-            )
+            raise insufficient_credentials
         return usuario_atual
+
     return check_role
 
 
