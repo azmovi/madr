@@ -26,7 +26,7 @@ services:
     build: ./frontend/
     image: vue_app
     ports:
-      - "8080:8080"
+      - "8080:80"
     depends_on:
       - mader_app
 

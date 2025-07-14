@@ -1,0 +1,25 @@
+service:
+  port: 80
+global:
+  namespace: madr
+  backend:
+    name: backend
+    port: 8000
+  frontend:
+    name: frontend
+    port: 80
+  database:
+    name: database
+    port: 5432
+
+ingress:
+  host: madr.local
+  paths:
+    - path: /api
+      pathType: Prefix
+      service: backend
+      rewrite: false
+    - path: /
+      pathType: Prefix
+      service: frontend
+      rewrite: true

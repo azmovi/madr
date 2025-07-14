@@ -1,0 +1,24 @@
+name: backend
+
+replicaCount: 1
+
+image:
+  repository: backend
+  tag: latest
+  pullPolicy: Never
+
+port: 8000
+
+resources:
+  requests:
+    memory: 1Gi
+    cpu: 1
+  limits:
+    memory: 2Gi
+    cpu: 2
+
+secrets:
+  secretKey: supersegredosecreto123
+  algorithm: HS256
+  accessTokenExpireMinutes: "30"
+  dbUrl: postgresql+psycopg://app_user:app_password@database:5432/app_db

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{.Release.name}}db-pv
+spec:
+  storageClassName: {{ .Values.storageClassName}}
+  capacity:
+    storage: {{ .Values.storage  }}
+  accessModes:
+    - {{ .Values.accessModes  }}
+  hostPath:
+    path: {{  .Values.hostPath.path  }} 
+    type: {{  .Values.hostPath.type  }}

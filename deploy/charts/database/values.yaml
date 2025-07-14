@@ -1,0 +1,36 @@
+name: database
+
+replicaCount: 1
+
+image:
+  repository: postgres
+  tag: latest
+  pullPolicy: Never
+
+port: 5432
+protocol: TCP
+
+storage: 2Gi
+
+resources:
+  requests:
+    memory: 1Gi
+    cpu: 1
+  limits:
+    memory: 2Gi
+    cpu: 2
+
+volumeMounts:
+  mountPath: /var/lib/postgresql/data
+
+secrets:
+  dbName: app_db
+  dbUser: app_user
+  dbPassword: app_password
+
+storageClassName: manual
+accessModes: ReadWriteOnce
+
+hostPath:
+  path: /data/postgres
+  type: DirectoryOrCreate
