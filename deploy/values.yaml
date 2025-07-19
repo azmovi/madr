@@ -1,17 +1,25 @@
 ingress:
   host: madr.local
-
+  enabled: true
+  className: nginx
+  
 service:
   port: 80
+  type: ClusterIP
 
 global:
   namespace: madr
   backend:
     name: backend
     port: 8000
+    replicas: 1
+    image: backend:latest
   frontend:
-    name: frontend
+    name: frontend  
     port: 80
+    replicas: 1
+    image: frontend:latest
   database:
     name: database
     port: 5432
+    replicas: 1

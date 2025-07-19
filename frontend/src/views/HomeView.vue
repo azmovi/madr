@@ -16,7 +16,7 @@ const users = ref([])
 
 onMounted(async () => {
   try {
-    const response = await fetch('/api/conta/', {
+    const response = await fetch('/api/conta', {
       method: 'GET',
     })
 

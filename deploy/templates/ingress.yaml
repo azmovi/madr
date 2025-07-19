@@ -3,8 +3,9 @@ kind: Ingress
 metadata:
   name: {{ .Release.Name }}-gateway-ingress
   namespace: {{ .Values.global.namespace }}
+  annotations:
+    spec.ingressClassName: nginx
 spec:
-  ingressClassName: nginx
   rules:
     - host: {{ .Values.ingress.host }}
       http:

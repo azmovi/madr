@@ -5,6 +5,11 @@ Projeto inspirado no curso de fastAPI do @dunossauro
 
 - O objetivo do projeto é criarmos um gerenciador de livros e relacionar com seus autores.
 
+### Rodando projeto com Minikube
+
+sudo echo "$(minikube ip) madr.local" >> /etc/hosts
+
+
 ### Sobre as partes do projeto
 
 #### Env de exemplo

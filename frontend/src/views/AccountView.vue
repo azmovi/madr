@@ -80,7 +80,7 @@ async function handleRegister() {
   message.value = ''
   
   try {
-    const res = await fetch('/api/conta/', {
+    const res = await fetch('/api/conta', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(registerData.value)
