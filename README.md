@@ -17,7 +17,15 @@ sudo echo "$(minikube ip) madr.local" >> /etc/hosts
 ./script.sh
 ```
 
-- Possiveis erros
+- Possíveis erros
+    - Outro problema que pode acontecer é o git clone não da as permissões
+    necessárias para o arquivo `madr/backend/entrypoint.sh`, esse arquivo é um
+    executável e ele é necessário para rodar as migrations, então case dê problema
+    com ele basta rodar o seguinte código.
+    ```bash
+    sudo chmod +x backend/entrypoint.sh
+    ```
+
     - Caso voce não tenha uma imagem do postgres na sua maquina pode ser que ele
     demore mais que o normal para subir o conteiner e isso vai acarretar em outro
     problema que no caso é o backend precisa do banco ativo para rodar as migrations
