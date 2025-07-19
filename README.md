@@ -7,11 +7,6 @@ Projeto inspirado no curso de fastAPI do @dunossauro
 
 ### Rodando projeto com Minikube
 
-- Colocar a url no hosts
-```bash
-sudo echo "$(minikube ip) madr.local" >> /etc/hosts
-```
-
 - Executar o minikube com o helm
 ```bash
 ./script.sh

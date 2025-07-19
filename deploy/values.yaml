@@ -1,5 +1,5 @@
 ingress:
-  host: madr.local
+  host: k8s.local
   enabled: true
   className: nginx
   
