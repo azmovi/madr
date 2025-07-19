@@ -9,6 +9,10 @@ Projeto inspirado no curso de fastAPI do @dunossauro
 
 sudo echo "$(minikube ip) madr.local" >> /etc/hosts
 
+> Não consegui fazer funcionar o madr.local como url padrão no meu browser, entretanto passando com o hosts como visto na tela funciona corretamente
+> No LE-6 fui capaz de rodar o minikube com a url mas aqui não sei o que rolou para não funcionar
+<img width="957" height="742" alt="image" src="https://github.com/user-attachments/assets/fe1ea995-3f15-4e94-b555-dd81f8cca053" />
+
 
 ### Sobre as partes do projeto
 
