@@ -14,7 +14,7 @@ from mader.utils import (
     sanitizar_username,
 )
 
-router = APIRouter(prefix='/conta', tags=['conta'])
+router = APIRouter(prefix='/api/conta', tags=['conta'])
 
 
 @router.post(

@@ -23,6 +23,6 @@ app.add_middleware(
 )
 
 
-@app.get('/', status_code=HTTPStatus.OK, response_model=Message)
+@app.get('/api', status_code=HTTPStatus.OK, response_model=Message)
 def read_root():
     return {'message': 'Ola mundo'}

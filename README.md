@@ -7,10 +7,29 @@ Projeto inspirado no curso de fastAPI do @dunossauro
 
 ### Rodando projeto com Minikube
 
+- Colocar a url no hosts
+```bash
 sudo echo "$(minikube ip) madr.local" >> /etc/hosts
+```
 
-> Não consegui fazer funcionar o madr.local como url padrão no meu browser, entretanto passando com o hosts como visto na tela funciona corretamente
-> No LE-6 fui capaz de rodar o minikube com a url mas aqui não sei o que rolou para não funcionar
+- Executar o minikube com o helm
+```bash
+./script.sh
+```
+
+- Possiveis erros
+    - Caso voce não tenha uma imagem do postgres na sua maquina pode ser que ele
+    demore mais que o normal para subir o conteiner e isso vai acarretar em outro
+    problema que no caso é o backend precisa do banco ativo para rodar as migrations
+    caso ele não esteja em pe a tempo para receber a conexão via http ira dar pau
+    se esse for o caso basta rodar o scritp novamente
+
+> Não consegui fazer funcionar o madr.local como url padrão no meu browser,
+entretanto passando com o hosts como visto na tela funciona corretamente
+
+> No LE-6 fui capaz de rodar o minikube com a url mas aqui não sei o que rolou
+para não funcionar
+
 <img width="957" height="742" alt="image" src="https://github.com/user-attachments/assets/fe1ea995-3f15-4e94-b555-dd81f8cca053" />
 
 
